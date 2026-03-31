@@ -1,7 +1,7 @@
 %%markdown
 
 
-## 🔄 Lake House Architecture
+# Lake House Architecture
 
 ```plaintext
 ┌───────────────┐     ┌────────────────┐       ┌───────────────┐          ┌──────────────┐
@@ -15,3 +15,10 @@
                         + ingested time         + Duplicates (Window) 
                            
 ```
+
+## Validation
+- timestamp - recent entries are considered or sum of entries per month 
+
+## Approaches
+- config notebooks for validation step
+- quarantine tables for invalid records.  
