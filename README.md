@@ -34,6 +34,7 @@
 - Generic Functions for validation step
 - quarantine tables for invalid records.  
 - Data Quality Daily records registration
+- Data Auditability
 
 ## Data Risk  & Handling Reports
 ```plaintext
