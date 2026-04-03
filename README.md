@@ -23,16 +23,17 @@
 ```
 
 ## Validation
-- Duplicates - window function for duplicates. row number 
+- Duplicates - window function for duplicates. row number in discounts & date in products sold (same pieces sold number more than 2 entries in date)
 - Duplicate count - rows / duplicates per table processing
 - constratints - Product ID not null 
-- constraints - ID matches among tables
+- constraints - ID matches among other tables
 - Number Anamolies - Discount numbers
 - Rount count & uniqueness with Null analysis
 
 ## Approaches
-- config notebooks for validation step
+- Generic Functions for validation step
 - quarantine tables for invalid records.  
+- Data Quality Daily records registration
 
 ## Data Risk  & Handling Reports
 ```plaintext
