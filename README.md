@@ -22,7 +22,7 @@
                                                      └───────────────┘
 ```
 
-## Validation
+## Silver Validation
 - Duplicates - window function for duplicates. row number in discounts & date in products sold (same pieces sold number more than 2 entries in date)
 - Duplicate count - rows / duplicates per table processing
 - constratints - Product ID not null 
@@ -35,10 +35,13 @@
 - quarantine tables for invalid records.  
 - Data Quality Daily records registration
 - Data Auditability 
+- ANSI SQL approach for aggregation (easy for multiple system)
+- havent used widgets, but easy integration to help Databricks asset bundle (CI/CD)
+- all tables are currently (overwrite and mergeschema) 
 
 ## Data Risk  & Handling Reports
 - no time in discount
-- grain = ProductID + city + date
+- grain = ProductID + city + date (products sold is main table)
 ```plaintext
       ┌───────────────┐                             ┌───────────────┐
       │   Silver      │     ─────────────────────▶  │ Strict        │ window function - row number (picked the recent entry)
@@ -71,7 +74,7 @@
 - Discount table needs date  (start and end)
 ```plaintext
                     +----------------------+
-                    |     Dim_Product      |
+                    |  Dim_Product_info    |
                     |----------------------|
                     | Product_ID (PK)      |
                     | Product Position     | 
@@ -83,16 +86,17 @@
                     | Name                 |
                     | Description          |
                     | Price                |
-                    | Currency             |
-                    | Terms                |
-                    | Section              |
-                    | Season               |
-                    | Material             |
-                    | Origin               |
-                    +----------------------+
-
-                           |
-                           |
+                    | Currency             |    +----------------------+     +----------------------+
+                    | Terms                |    |   Dim_Products_sold  |     |     Dim_Discount     |
+                    | Section              |    |----------------------|     |----------------------|
+                    | Season               |    |     Product_ID (PK)  |     |   Product_ID (PK)    |
+                    | Material             |    |     products_sold    |     |   city               |
+                    | Origin               |    |     city             |     |   discount           |
+                    |                      |    |     time             |     |                      |
+                    +----------------------+    +----------------------+     +----------------------+
+                           |                              |                            |
+                           |                              |                            |
+                           |────────────────────────────────────────────────────────────
                            |
 +------------------+       |       +----------------------+
 |  Dim_Location    |       |       |      Dim_Date        |        Dataskipping. 
@@ -104,10 +108,16 @@
                     +----------------------+
                     |     Fact_Sales       |
                     |----------------------|
-                    | Product_ID (FK)      |  (Autoloader Function will benift here using read stream and apppend write method)
-                    | City (FK)            |
+                    | product_id (FK)      |  (Autoloader Function will benift here using read stream and apppend write method)
+                    | city (FK)            |
                     | Time (FK)            |
-                    | Pieces_Sold          |
+                    | pieces_sold          |
+                    | unit_price           | 
+                    |                      |
+                    | revenue              | Pieces sold * unit_price
+                    | discount             |
+                    | discount_amount      |  revenue * Discount
+                    | net_revenue          |  revenue - discount
                     +----------------------+
 
                            |
