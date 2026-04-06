@@ -46,9 +46,11 @@
 - havent used widgets, but easy integration to help Databricks asset bundle (CI/CD)
 - all tables are currently (overwrite and mergeschema) 
 
-## Data Risk  & Handling 
+## Data Handling & Risk planning 
 - no time in discount
 - grain = ProductID + city + date (products sold is main table)
+- 1 detailed silverver fact table + 4 reusing Gold Aggregate Tables
+
 ```plaintext
       ┌───────────────┐                             ┌───────────────┐
       │   Silver      │     ─────────────────────▶  │ Strict        │ window function - row number (picked the recent entry)
@@ -117,29 +119,34 @@
                            |
                            |
                     +----------------------+
-                    |     Fact_Sales       |
+                    |     Fact_Sales       | (silver Table)
                     |----------------------|
                     | product_id (FK)      |  (Autoloader Function will benift here using read stream and apppend write method)
                     | city (FK)            |
-                    | Time (FK)            |
-                    | pieces_sold          |
-                    | unit_price           | 
-                    |                      |
-                    | revenue              | Pieces sold * unit_price
-                    | discount             |
-                    | discount_amount      |  revenue * Discount
-                    | net_revenue          |  revenue - discount
-                    +----------------------+
-
-                           |
-                           |
-                    +----------------------+
-                    |   Fact_Discount      |
-                    |----------------------|
-                    | Product_ID (FK)      | ( slow changing type 2 tables will benift here.)
-                    | City (FK)            |
-                    | Discount             |
-                    +----------------------+
+                    | date (FK)            |
+                    | pieces_sold          |                        (Sales Gold Tables with reusable Metrics) Aggregated tables
+                    | unit_price           |──────────────────────────────────────────────────────────────────────────────────────────────────  
+                    |                      |            |                            |                          |                             |
+(Pieces sold *      | revenue              |            |                            |                          |                             |
+   unit_price)      | discount             |  +----------------------+    +----------------------+   +----------------------+   +----------------------+
+revenue * Discount  | discount_amount      |  |   Gold_city_sales    |    | Gold_Product_sales   |   | Gold_fact_sales      |   |Gold_product_attribute|
+revenue - Discount  | net_revenue          |  +----------------------+    +----------------------+   +----------------------+   +----------------------+
+                    +----------------------+  |   City               |    |  Product_ID          |   |  Product_ID          |   |    Product_ID        |
+                           |                  |   total_volume       |    |  total_sold          |   |  City                |   |    City              |
+                           |                  |   total_net_revenue  |    |  total_net_revenue   |   |  date                |   |    section           |
+                           |                  |   avg_discount       |    |                      |   |  total_pieces_sold   |   |    season            |
+                    +----------------------+  +----------------------+    +----------------------+   |  total_revenue       |   |    material          |
+                    |   Fact_Discount      |      sum(pieces_sold)           sum(pieces_Sold)        |  total_discount      |   |    origin            |
+                    |----------------------|      sum(net_revenue)           sum(net_Revenue)        |  total_net_revenue   |   |                      |
+                    | Product_ID (FK)      |      AVG (discount)                                     |   avg_price          |   |                      |
+                    | City (FK)            |                                                         |   avg_discount       |   |                      |
+( slow changing     | Discount             |                                                         +----------------------+   +----------------------+
+   type 2 tables    |                      |                                                            sum(pieces_sold)
+   will benifit     |                      |                                                            sum(revenue)
+    here )          +----------------------+                                                            sum(discount_amount)
+                                                                                                        sum(net_revenue)
+                                                                                                        avg(unit_price)
+                                                                                                        avg(discount)
 ```
 
 ## Data quality Report
