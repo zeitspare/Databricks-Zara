@@ -137,13 +137,13 @@ revenue - Discount  | net_revenue          |  +----------------------+    +-----
                            |                  |   avg_discount       |    |                      |   |  total_pieces_sold   |   |    season            |
                     +----------------------+  +----------------------+    +----------------------+   |  total_revenue       |   |    material          |
                     |   Fact_Discount      |      sum(pieces_sold)           sum(pieces_Sold)        |  total_discount      |   |    origin            |
-                    |----------------------|      sum(net_revenue)           sum(net_Revenue)        |  total_net_revenue   |   |                      |
-                    | Product_ID (FK)      |      AVG (discount)                                     |   avg_price          |   |                      |
-                    | City (FK)            |                                                         |   avg_discount       |   |                      |
+                    |----------------------|      sum(net_revenue)           sum(net_Revenue)        |  total_net_revenue   |   |    total_sold        |
+                    | Product_ID (FK)      |      AVG (discount)                                     |   avg_price          |   |    total_revenue     |
+                    | City (FK)            |                                                         |   avg_discount       |   |    avg_discount      |
 ( slow changing     | Discount             |                                                         +----------------------+   +----------------------+
-   type 2 tables    |                      |                                                            sum(pieces_sold)
-   will benifit     |                      |                                                            sum(revenue)
-    here )          +----------------------+                                                            sum(discount_amount)
+   type 2 tables    |                      |                                                            sum(pieces_sold)           sum(pieces_sold)
+   will benifit     |                      |                                                            sum(revenue)               sum(net_revenue)
+    here )          +----------------------+                                                            sum(discount_amount)       aug(discount)
                                                                                                         sum(net_revenue)
                                                                                                         avg(unit_price)
                                                                                                         avg(discount)
