@@ -6,8 +6,8 @@
 ```plaintext
 ┌───────────────┐     ┌────────────────┐             ┌───────────────┐               ┌──────────────┐           ┌──────────────┐
 │ Data Source   │ ──▶ │ Bronze Tables  │  ────────▶  │ Silver Tables │      ───────▶ │ Gold Tables  │    ──▶    │ platinum     │
-│               │     │                │   (valid    │               │               │              │           │  Tables      │  
-│(retail-source)│     │ (retail-bronze)│   records)  │(retail-silver)│               │(retail-gold) │           │              │
+│               │     │                │   (valid    │               │       (OP     │              │           │  Tables      │  
+│(retail-source)│     │ (retail-bronze)│   records)  │(retail-silver)│      Records) │(retail-gold) │           │              │
 └───────────────┘     └────────────────┘             └───────────────┘               └──────────────┘           └──────────────┘
 (landing_zone)          (raw_zone)                    (cleaned_zone)                  (semantic_zone)            (row level logic)
       uploads           metadata (all tables)         normalized data              complex Aggregation data      not in this sample
