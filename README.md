@@ -4,22 +4,29 @@
 # Lake House Architecture
 
 ```plaintext
-┌───────────────┐     ┌────────────────┐             ┌───────────────┐          ┌──────────────┐           ┌──────────────┐
-│ Data Source   │ ──▶ │ Bronze Tables  │  ────────▶  │ Silver Tables │      ──▶ │ Gold Tables  │    ──▶    │ platinum     │
-│               │     │                │   (valid    │               │          │              │           │  Tables      │  
-│(retail-source)│     │ (retail-bronze)│   records)  │(retail-silver)│          │(retail-gold) │           │              │
-└───────────────┘     └────────────────┘             └───────────────┘          └──────────────┘           └──────────────┘
-(landing_zone)          (raw_zone)                    (cleaned_zone)            (semantic_zone)               (row level logic)
-  csv uploads           metadata (all tables)         normalized data           complex Aggregation data      not in this sample
+┌───────────────┐     ┌────────────────┐             ┌───────────────┐               ┌──────────────┐           ┌──────────────┐
+│ Data Source   │ ──▶ │ Bronze Tables  │  ────────▶  │ Silver Tables │      ───────▶ │ Gold Tables  │    ──▶    │ platinum     │
+│               │     │                │   (valid    │               │               │              │           │  Tables      │  
+│(retail-source)│     │ (retail-bronze)│   records)  │(retail-silver)│               │(retail-gold) │           │              │
+└───────────────┘     └────────────────┘             └───────────────┘               └──────────────┘           └──────────────┘
+(landing_zone)          (raw_zone)                    (cleaned_zone)                  (semantic_zone)            (row level logic)
+      uploads           metadata (all tables)         normalized data              complex Aggregation data      not in this sample
                         + source & file name          + UTC -> timestamp        
                         + ingested time               + Duplicates (Window) 
-                        + Auditable column names
-                            │
-                            │                        ┌───────────────┐
-                            └─────────────────────▶  │ Quarantine    │
-                               (invalid records)     │    Tables     │
-                                                     │(retail-silver)│
-                                                     └───────────────┘
+                        + Auditable column names                     
+                            │                                │   (Optimization Reports)
+      (invalid records)     │     ┌───────────────┐          │ + SKEW Problem identification
+                            └──▶  │ Quarantine    │          │ + Predicate push down 
+                            │     │    Tables     │          │ 
+                            │     │ (QT-bronze)   │          │ 
+                            │     └───────────────┘          │ 
+(Data Quality reports)      │     ┌─────────────────┐        │     ┌─────────────────┐
+                            └──▶  │ Quality Tables  │        └──▶. │   Optimization  │
+                                  │                 │              │     Tables      │
+                                  │  (QY-Bronze).   │              │    (OP-Silver)  │
+                                  └─────────────────┘              └─────────────────┘
+
+
 ```
 
 ## Silver Validation
